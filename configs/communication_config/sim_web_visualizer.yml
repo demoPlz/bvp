@@ -4,5 +4,5 @@ communication:
   viz_host: localhost
   viz_port: 6000
   viz_urdf_paths:
-    - assembly/xarm7_ability/xarm7_ability_left_hand.urdf
-    - assembly/xarm7_ability/xarm7_ability_right_hand.urdf
+    - assembly/kinova3_robotiq_2f_85/kinova_gen3_robotiq_2f_85_left.urdf
+    - assembly/kinova3_robotiq_2f_85/kinova_gen3_robotiq_2f_85_right.urdf
