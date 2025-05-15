@@ -10,13 +10,13 @@ left:
     
     # For Robotiq, we just need one control point for opening/closing
     target_joint_names: ["robotiq_85_left_knuckle_joint"]
-    target_origin_link_names: ["robotiq_85_base_link"]
+    target_origin_link_names: ["robotiq_85_base_link","robotiq_85_base_link"]
     target_task_link_names: ["robotiq_85_left_finger_tip_link", "robotiq_85_right_finger_tip_link"]
     scaling_factor: 0.8
     
     # You'll need to simplify the hand retargeting for a two-finger gripper
     # This maps human hand opening/closing to gripper
-    target_link_human_indices: [[4], [8]] # Using index finger position to control gripper
+    target_link_human_indices: [[0,0], [4,8]] # Using index finger position to control gripper
     
     # May need tuning for your specific setup
     low_pass_alpha: 0.4
