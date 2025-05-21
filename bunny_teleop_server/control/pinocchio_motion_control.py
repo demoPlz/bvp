@@ -36,9 +36,21 @@ class PinocchioMotionControl(BaseMotionControl):
 
         # Build robot
         urdf_path = self.get_urdf_absolute_path(cfg, robot_config_path)
-        self.model: pin.Model = pin.buildModelFromUrdf(str(urdf_path))
+        self.model: pin.Model = pin.buildModelFromUrdf(str(urdf_path),mimic=True)
         self.data: pin.Data = self.model.createData()
         frame_mapping: Dict[str, int] = {}
+
+        print("Pinocchio shape : ")
+
+        for i in range(1,self.model.njoints):
+         joint = self.model.joints[i]
+         joint_name = self.model.names[i]
+         print("Joint name : " , joint_name)
+         print("Joint type : ", joint)
+
+
+
+        print(pin.neutral(self.model).shape[0])
 
         for i, frame in enumerate(self.model.frames):
             frame_mapping[frame.name] = i
@@ -95,6 +107,9 @@ class PinocchioMotionControl(BaseMotionControl):
             return self.qpos.copy()
 
     def set_current_qpos(self, qpos: np.ndarray):
+        print("Pinocchio shape : ")
+
+        print(pin.neutral(self.model).shape[0])
         with self._qpos_lock:
             self.qpos = qpos
             pin.forwardKinematics(self.model, self.data, self.qpos)

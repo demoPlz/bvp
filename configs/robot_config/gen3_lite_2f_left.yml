@@ -1,0 +1,9 @@
+robot_cfg:
+  dt: 0.05
+  urdf_path: assembly/kinova_gen3_lite_gen3_2f/kinova_gen3_lite_gen3_lite_2f_left.urdf
+
+  kinematics:
+    ik_damping: 1e-5
+    eps: 1e-3
+    ee_link: end_effector_link
+

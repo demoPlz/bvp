@@ -1,0 +1,60 @@
+left:
+  retargeting:
+    type: vector
+
+    #Path to kinova_gen3_lite_2_f hands
+    urdf_path: hands/gen3_lite_2f/gen3_lite_2f.urdf
+
+    wrist_link_name: "gripper_base_link"
+
+    target_joint_names: ["right_finger_bottom_joint"]
+
+    target_origin_link_names: ["gripper_base_link","gripper_base_link"]
+    target_task_link_names: ["left_finger_dist_link","right_finger_dist_link"]
+
+    scaling_factor: 1.0
+
+    target_link_human_indices: [[0,0],[4,8]]
+
+    low_pass_alpha: 0.4
+
+    control:
+      type: pinocchio
+      robot_name: gen3_lite_2f_left
+
+      robot_config_path: gen3_lite_2f_left.yml
+      low_pass_alpha: 0.05
+
+      disable_orientation_control: False
+      motion_scaling_factor: 0.8
+
+
+right:
+  retargeting:
+    type: vector
+
+    #Path to kinova_gen3_lite_2_f hands
+    urdf_path: hands/gen3_lite_2f/gen3_lite_2f.urdf
+
+    wrist_link_name: "gripper_base_link"
+
+    target_joint_names: ["right_finger_bottom_joint"]
+
+    target_origin_link_names: ["gripper_base_link","gripper_base_link"]
+    target_task_link_names: ["left_finger_dist_link","right_finger_dist_link"]
+
+    scaling_factor: 1.0
+
+    target_link_human_indices: [[0,0],[4,8]]
+
+    low_pass_alpha: 0.4
+
+    control:
+      type: pinocchio
+      robot_name: gen3_lite_2f_right
+
+      robot_config_path: gen3_lite_2f_right.yml
+      low_pass_alpha: 0.05
+
+      disable_orientation_control: False
+      motion_scaling_factor: 0.8
