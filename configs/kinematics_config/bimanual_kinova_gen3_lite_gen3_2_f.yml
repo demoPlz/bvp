@@ -18,15 +18,15 @@ left:
 
     low_pass_alpha: 0.4
 
-    control:
-      type: pinocchio
-      robot_name: gen3_lite_2f_left
+  control:
+    type: pinocchio
+    robot_name: gen3_lite_2f_left
 
-      robot_config_path: gen3_lite_2f_left.yml
-      low_pass_alpha: 0.05
+    robot_config_path: gen3_lite_2f_left.yml
+    low_pass_alpha: 0.05
 
-      disable_orientation_control: False
-      motion_scaling_factor: 0.8
+    disable_orientation_control: False
+    motion_scaling_factor: 0.8
 
 
 right:
@@ -49,12 +49,12 @@ right:
 
     low_pass_alpha: 0.4
 
-    control:
-      type: pinocchio
-      robot_name: gen3_lite_2f_right
+  control:
+    type: pinocchio
+    robot_name: gen3_lite_2f_right
 
-      robot_config_path: gen3_lite_2f_right.yml
-      low_pass_alpha: 0.05
+    robot_config_path: gen3_lite_2f_right.yml
+    low_pass_alpha: 0.05
 
-      disable_orientation_control: False
-      motion_scaling_factor: 0.8
+    disable_orientation_control: False
+    motion_scaling_factor: 0.8
