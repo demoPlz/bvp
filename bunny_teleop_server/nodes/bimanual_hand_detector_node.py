@@ -75,8 +75,8 @@ class VisionProHandDetector(Node):
         self,
         vision_pro_name,
         vision_pro_ip,
-        verbose=False,
-        visualize_3d_detection=False,
+        verbose=True,
+        visualize_3d_detection=True,
     ):
         super().__init__(node_name=f"{vision_pro_name}_hand_detector")
         self.visionpro_name = vision_pro_name
