@@ -7,7 +7,7 @@ left:
 
     wrist_link_name: "gripper_base_link"
 
-    target_joint_names: ["right_finger_bottom_joint"]
+    target_joint_names: null
 
     target_origin_link_names: ["gripper_base_link","gripper_base_link"]
     target_task_link_names: ["left_finger_dist_link","right_finger_dist_link"]
@@ -38,7 +38,7 @@ right:
 
     wrist_link_name: "gripper_base_link"
 
-    target_joint_names: ["right_finger_bottom_joint"]
+    target_joint_names: null
 
     target_origin_link_names: ["gripper_base_link","gripper_base_link"]
     target_task_link_names: ["left_finger_dist_link","right_finger_dist_link"]
