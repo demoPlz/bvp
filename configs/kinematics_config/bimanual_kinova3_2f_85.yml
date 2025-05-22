@@ -9,7 +9,7 @@ left:
     wrist_link_name: "robotiq_85_base_link"
     
     # For Robotiq, we just need one control point for opening/closing
-    target_joint_names: ["robotiq_85_left_knuckle_joint"]
+    target_joint_names: null
     target_origin_link_names: ["robotiq_85_base_link","robotiq_85_base_link"]
     target_task_link_names: ["robotiq_85_left_finger_tip_link", "robotiq_85_right_finger_tip_link"]
     scaling_factor: 0.8
@@ -47,7 +47,7 @@ right:
     wrist_link_name: "robotiq_85_base_link"
     
     # For Robotiq, we just need one control point for opening/closing
-    target_joint_names: ["robotiq_85_left_knuckle_joint"]
+    target_joint_names: null
     target_origin_link_names: ["robotiq_85_base_link","robotiq_85_base_link"]
     target_task_link_names: ["robotiq_85_left_finger_tip_link", "robotiq_85_right_finger_tip_link"]
     scaling_factor: 0.8
