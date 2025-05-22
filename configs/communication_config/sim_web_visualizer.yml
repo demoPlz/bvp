@@ -4,4 +4,5 @@ communication:
   viz_host: localhost
   viz_port: 6000
   viz_urdf_paths:
+    - assembly/kinova_gen3_lite_gen3_2f/kinova_gen3_lite_gen3_lite_2f_left.urdf
     - assembly/kinova_gen3_lite_gen3_2f/kinova_gen3_lite_gen3_lite_2f_right.urdf
