@@ -7,14 +7,14 @@ left:
 
     wrist_link_name: "gripper_base_link"
 
-    target_joint_names: null
+    target_joint_names: [ "right_finger_bottom_joint" ]
 
-    target_origin_link_names: ["gripper_base_link","gripper_base_link"]
-    target_task_link_names: ["left_finger_dist_link","right_finger_dist_link"]
+    target_origin_link_names: [ "left_finger_dist_link" ]
+    target_task_link_names: [ "right_finger_dist_link" ]
 
-    scaling_factor: 1.0
+    scaling_factor: 1.5
 
-    target_link_human_indices: [[0,0],[4,8]]
+    target_link_human_indices: [[4],[8]]
 
     low_pass_alpha: 0.4
 
@@ -38,14 +38,14 @@ right:
 
     wrist_link_name: "gripper_base_link"
 
-    target_joint_names: null
+    target_joint_names: [ "right_finger_bottom_joint" ]
 
-    target_origin_link_names: ["gripper_base_link","gripper_base_link"]
-    target_task_link_names: ["left_finger_dist_link","right_finger_dist_link"]
+    target_origin_link_names: [ "left_finger_dist_link" ]
+    target_task_link_names: [ "right_finger_dist_link" ]
 
-    scaling_factor: 1.0
+    scaling_factor: 1.5
 
-    target_link_human_indices: [[0,0],[4,8]]
+    target_link_human_indices: [[4],[8]]
 
     low_pass_alpha: 0.4
 

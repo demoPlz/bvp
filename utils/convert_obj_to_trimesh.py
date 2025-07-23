@@ -23,7 +23,7 @@ def convert_to_collision_obj(input_file, output_file):
     mesh.export(output_file)
 
 
-def batch_convert(input_dir,output_dir,file_pattern="*.STL"):
+def batch_convert(input_dir,output_dir,file_pattern="*.stl"):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
@@ -40,8 +40,8 @@ def batch_convert(input_dir,output_dir,file_pattern="*.STL"):
 
 
 if __name__ == "__main__":
-    input_file = "/home/perseusdg/Development/colcon_ws/src/ros2_kortex/kortex_description/grippers/gen3_lite_2f/meshes"
-    output_file = "collision"
+    input_file = "/home/perseusdg/Development/bvp/assets/urdf/arms/wxai_base_arm/visual/"
+    output_file = "/home/perseusdg/Development/bvp/assets/urdf/arms/wxai_base_arm/collision"
 
     batch_convert(input_file,output_file)
 

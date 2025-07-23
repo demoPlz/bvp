@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<robot name="wxai_gripper">
+  <material name="trossen_black">
+    <texture filename="package://trossen_arm_description/meshes/trossen_black.png"/>
+  </material>
+
+  <link name="world"/>
+
+  <joint name="joint_5" type="revolute">
+    <origin rpy="0 0 0" xyz="0.02895 0 -0.0455"/>
+    <parent link="world"/>
+    <child link="link_6"/>
+    <axis xyz="1 0 0"/>
+    <limit effort="7.0" lower="-3.141592653589793" upper="3.141592653589793" velocity="7.0"/>
+  </joint>
+
+  <link name="link_6">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.04572768 -0.00000726 0.00001402"/>
+      <mass value="0.55469347"/>
+      <inertia ixx="0.00082429" ixy="-0.00000051" ixz="0.00000010" iyy="0.00048759" iyz="0.00000004" izz="0.00108600"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/link_6.stl"/>
+      </geometry>
+      <material name="trossen_black"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/link_6.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="carriage_right">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.00889602 0.00403514 0.00457901"/>
+      <mass value="0.05036313"/>
+      <inertia ixx="0.00001736" ixy="-0.00000165" ixz="-0.00000104" iyy="0.00000591" iyz="-0.00000172" izz="0.00001378"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/carriage_right.stl"/>
+      </geometry>
+      <material name="trossen_black"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/carriage_right.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_carriage_joint" type="prismatic">
+    <origin rpy="0 0 0" xyz="0.0865 -0.023 0"/>
+    <parent link="link_6"/>
+    <child link="carriage_right"/>
+    <mimic joint="left_carriage_joint"/>
+    <axis xyz="0 -1 0"/>
+    <limit effort="400.0" lower="0.0" upper="0.044" velocity="0.0875"/>
+  </joint>
+  <link name="carriage_left">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.00889602 -0.00403515 -0.00457908"/>
+      <mass value="0.05036313"/>
+      <inertia ixx="0.00001736" ixy="-0.00000165" ixz="-0.00000104" iyy="0.00000591" iyz="-0.00000172" izz="0.00001378"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/carriage_left.stl"/>
+      </geometry>
+      <material name="trossen_black"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/carriage_left.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_carriage_joint" type="prismatic">
+    <origin rpy="0 0 0" xyz="0.0865 0.023 0"/>
+    <parent link="link_6"/>
+    <child link="carriage_left"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="400.0" lower="0.0" upper="0.044" velocity="0.0875"/>
+  </joint>
+  <link name="gripper_left">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.01893993 -0.00901223 -0.00215453"/>
+      <mass value="0.03090787"/>
+      <inertia ixx="0.00000769" ixy="0.00000321" ixz="0.00000029" iyy="0.00001487" iyz="-0.00000020" izz="0.00001184"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/gripper_left.stl"/>
+      </geometry>
+      <material name="trossen_black"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/gripper_left.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_gripper_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="carriage_left"/>
+    <child link="gripper_left"/>
+  </joint>
+  <link name="gripper_right">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.01893989 0.00901216 -0.00215461"/>
+      <mass value="0.03090786"/>
+      <inertia ixx="0.00000769" ixy="-0.00000321" ixz="0.00000029" iyy="0.00001487" iyz="0.00000020" izz="0.00001184"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/visual/gripper_right.stl"/>
+      </geometry>
+      <material name="trossen_black"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/collision/gripper_right.obj"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_gripper_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="carriage_right"/>
+    <child link="gripper_right"/>
+  </joint>
+  <joint name="ee_gripper" type="fixed">
+    <origin rpy="0 0 0" xyz="0.156062 0 0"/>
+    <parent link="link_6"/>
+    <child link="ee_gripper_link"/>
+  </joint>
+  <link name="ee_gripper_link"/>
+</robot>
