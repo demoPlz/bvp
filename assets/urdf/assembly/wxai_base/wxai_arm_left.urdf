@@ -12,14 +12,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/base_link.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/base_link.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/base_link.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/base_link.obj"/>
       </geometry>
     </collision>
   </link>
@@ -32,14 +32,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_1.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/link_1.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_1.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/link_1.obj"/>
       </geometry>
     </collision>
   </link>
@@ -59,14 +59,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_2.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/link_2.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_2.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/link_2.obj"/>
       </geometry>
     </collision>
   </link>
@@ -86,14 +86,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_3.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/link_3.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_3.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/link_3.obj"/>
       </geometry>
     </collision>
   </link>
@@ -113,14 +113,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_4.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/link_4.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_4.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/link_4.obj"/>
       </geometry>
     </collision>
   </link>
@@ -140,14 +140,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_5.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/link_5.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_5.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/link_5.obj"/>
       </geometry>
     </collision>
   </link>
@@ -167,14 +167,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_6.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/link_6.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/link_6.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/link_6.obj"/>
       </geometry>
     </collision>
   </link>
@@ -194,14 +194,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/carriage_right.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/carriage_right.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/carriage_right.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/carriage_right.obj"/>
       </geometry>
     </collision>
   </link>
@@ -222,14 +222,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/carriage_left.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/carriage_left.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/carriage_left.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/carriage_left.obj"/>
       </geometry>
     </collision>
   </link>
@@ -249,14 +249,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/gripper_left.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/gripper_left.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/gripper_left.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/gripper_left.obj"/>
       </geometry>
     </collision>
   </link>
@@ -274,14 +274,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/gripper_right.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/visual/gripper_right.stl"/>
       </geometry>
       <material name="trossen_black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://trossen_arm_description/meshes/wxai/gripper_right.stl"/>
+        <mesh filename="../../arms/wxai_base_arm/collision/gripper_right.obj"/>
       </geometry>
     </collision>
   </link>
