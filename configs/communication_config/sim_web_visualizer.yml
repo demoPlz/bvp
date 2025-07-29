@@ -4,5 +4,5 @@ communication:
   viz_host: localhost
   viz_port: 6000
   viz_urdf_paths:
-    - assembly/wxai_base/wxai_base_left.urdf
-    - assembly/wxai_base/wxai_base_right.urdf
+    - assembly/wxai_base/wxai_arm_left.urdf
+    - assembly/wxai_base/wxai_arm_right.urdf
