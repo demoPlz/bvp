@@ -1,6 +1,6 @@
 robot_cfg:
   dt: 0.05
-  urdf_path: assembly/wxai_arm/wxai_arm_left.urdf
+  urdf_path: assembly/wxai_base/wxai_arm_left.urdf
 
   kinematics:
     ik_damping: 1e-5
