@@ -1,60 +1,79 @@
-left:
-  retargeting:
-    type: vector
-
-    # Path to wxai_base gripper hands
-    urdf_path: hands/wxai_base_gripper/wxai_base_gripper.urdf
-
-    wrist_link_name: "link_6"
-
-    target_joint_names: [ "left_carriage_joint" ]
-
-    target_origin_link_names: [ "gripper_right" ]
-    target_task_link_names: [ "gripper_left" ]
-
-    scaling_factor: 1.5
-
-    target_link_human_indices: [[4],[8]]
-
-    low_pass_alpha: 0.4
-
-  control:
-    type: pinocchio
-    robot_name: wxai_base_left
-
-    robot_config_path: wxai_base_left.yml
-    low_pass_alpha: 0.05
-
-    disable_orientation_control: False
-    motion_scaling_factor: 0.8
-
-
 right:
   retargeting:
     type: vector
 
-    # Path to wxai_base gripper hands
-    urdf_path: hands/wxai_base_gripper/wxai_base_gripper.urdf
+    urdf_path: grippers/wxai_base_gripper/wxai_base_gripper_retargeting.urdf
 
-    wrist_link_name: "link_6"
+    # Wrist link name of the gripper in URDF
+    wrist_link_name: "gripper_base"
 
-    target_joint_names: [ "left_carriage_joint" ]
+    # Target refers to the retargeting target, which is the robot gripper
+    target_joint_names: null
+    target_origin_link_names: [ "gripper_base", "gripper_base" ]
+    target_task_link_names: [ "gripper_left", "gripper_right" ]
+    scaling_factor: 1.0
 
-    target_origin_link_names: [ "gripper_right" ]
-    target_task_link_names: [ "gripper_left" ]
+    # Source refers to the retargeting input, which corresponds to the human hand
+    # Map thumb tip (index 4) and index finger tip (index 8) to gripper fingers
+    target_link_human_indices: [ [ 4 ], [ 8 ] ]
 
-    scaling_factor: 1.5
-
-    target_link_human_indices: [[4],[8]]
-
+    # Low pass filter for gripper
+    # A smaller alpha means stronger filtering, i.e. more smooth but also larger latency
     low_pass_alpha: 0.4
 
   control:
     type: pinocchio
-    robot_name: wxai_base_right
 
-    robot_config_path: wxai_base_right.yml
+    robot_name: wxai_gripper_right
+
+    # Config path with more details about the robot and its kinematics
+    robot_config_path: wxai_gripper_right.yml
+
+    # Low pass filter for arm (not applicable for gripper-only setup)
     low_pass_alpha: 0.05
 
+    # Set True if you do not want to control the orientation of gripper
     disable_orientation_control: False
-    motion_scaling_factor: 0.8
+
+    # Set to a smaller value for first trial before you are familiar with the system
+    motion_scaling_factor: 0.5
+
+left:
+  retargeting:
+    type: vector
+
+    urdf_path: grippers/wxai_base_gripper/wxai_base_gripper_retargeting.urdf
+
+    # Wrist link name of the gripper in URDF
+    wrist_link_name: "gripper_base"
+
+    # Target refers to the retargeting target, which is the robot gripper
+    target_joint_names: null
+    target_origin_link_names: [ "gripper_base", "gripper_base" ]
+    target_task_link_names: [ "gripper_left", "gripper_right" ]
+    scaling_factor: 1.0
+
+    # Source refers to the retargeting input, which corresponds to the human hand
+    # Map thumb tip (index 4) and index finger tip (index 8) to gripper fingers
+    target_link_human_indices: [ [ 4 ], [ 8 ] ]
+
+    # Low pass filter for gripper
+    # A smaller alpha means stronger filtering, i.e. more smooth but also larger latency
+    low_pass_alpha: 0.4
+
+  control:
+    type: pinocchio
+
+    robot_name: wxai_gripper_left
+
+    # Config path with more details about the robot and its kinematics
+    robot_config_path: wxai_gripper_left
+
+    # Low pass filter for arm (not applicable for gripper-only setup)
+    low_pass_alpha: 0.05
+
+    # Set True if you do not want to control the orientation of gripper
+    disable_orientation_control: False
+
+    # Set to a smaller value for first trial before you are familiar with the system
+    motion_scaling_factor: 0.5

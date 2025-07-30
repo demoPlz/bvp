@@ -58,11 +58,12 @@
     </collision>
   </link>
 
+  <!-- RIGHT CARRIAGE JOINT - NO MIMIC for retargeting -->
   <joint name="right_carriage_joint" type="prismatic">
     <origin rpy="0 0 0" xyz="0.0865 -0.023 0"/>
     <parent link="gripper_base"/>
     <child link="carriage_right"/>
-    <mimic joint="left_carriage_joint"/>
+    <!-- REMOVED: <mimic joint="left_carriage_joint"/> -->
     <axis xyz="0 -1 0"/>
     <limit effort="400.0" lower="0.0" upper="0.044" velocity="0.0875"/>
   </joint>
@@ -89,6 +90,7 @@
     </collision>
   </link>
 
+  <!-- LEFT CARRIAGE JOINT - Independent control for retargeting -->
   <joint name="left_carriage_joint" type="prismatic">
     <origin rpy="0 0 0" xyz="0.0865 0.023 0"/>
     <parent link="gripper_base"/>
