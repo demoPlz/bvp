@@ -24,10 +24,10 @@ right:
   control:
     type: pinocchio
 
-    robot_name: wxai_gripper_right
+    robot_name: wxai_base_right
 
     # Config path with more details about the robot and its kinematics
-    robot_config_path: wxai_gripper_right.yml
+    robot_config_path: wxai_base_right.yml
 
     # Low pass filter for arm (not applicable for gripper-only setup)
     low_pass_alpha: 0.05
@@ -64,10 +64,10 @@ left:
   control:
     type: pinocchio
 
-    robot_name: wxai_gripper_left
+    robot_name: wxai_base_left
 
     # Config path with more details about the robot and its kinematics
-    robot_config_path: wxai_gripper_left
+    robot_config_path: wxai_base_left.yml
 
     # Low pass filter for arm (not applicable for gripper-only setup)
     low_pass_alpha: 0.05
