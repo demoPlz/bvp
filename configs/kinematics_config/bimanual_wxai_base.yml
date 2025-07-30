@@ -2,20 +2,20 @@ right:
   retargeting:
     type: vector
 
-    urdf_path: grippers/wxai_base_gripper/wxai_base_gripper_retargeting.urdf
+    urdf_path: hands/wxai_base_gripper/wxai_base_gripper_retargeting.urdf
 
     # Wrist link name of the gripper in URDF
     wrist_link_name: "gripper_base"
 
     # Target refers to the retargeting target, which is the robot gripper
     target_joint_names: null
-    target_origin_link_names: [ "gripper_base", "carriage_right" ]
-    target_task_link_names: [ "carriage_left", "gripper_base" ]
+    target_origin_link_names: ["gripper_left" ]
+    target_task_link_names: [ "gripper_right" ]
     scaling_factor: 3.0
 
     # Source refers to the retargeting input, which corresponds to the human hand
     # Map thumb tip (index 4) and index finger tip (index 8) to gripper fingers
-    target_link_human_indices: [[4,8],[8,4]]
+    target_link_human_indices: [[4],[8]]
 
     # Low pass filter for gripper
     # A smaller alpha means stronger filtering, i.e. more smooth but also larger latency
@@ -42,24 +42,24 @@ left:
   retargeting:
     type: vector
 
-    urdf_path: grippers/wxai_base_gripper/wxai_base_gripper_retargeting.urdf
+    urdf_path: hands/wxai_base_gripper/wxai_base_gripper_retargeting.urdf
 
     # Wrist link name of the gripper in URDF
     wrist_link_name: "gripper_base"
 
     # Target refers to the retargeting target, which is the robot gripper
     target_joint_names: null
-    target_origin_link_names: [ "gripper_base", "carriage_right" ]
-    target_task_link_names: [ "carriage_left", "gripper_base" ]
+    target_origin_link_names: [ "gripper_right" ]
+    target_task_link_names: [ "gripper_left" ]
     scaling_factor: 3.0
 
     # Source refers to the retargeting input, which corresponds to the human hand
     # Map thumb tip (index 4) and index finger tip (index 8) to gripper fingers
-    target_link_human_indices: [[4,8],[8,4]]
+    target_link_human_indices: [[4],[8]]
 
     # Low pass filter for gripper
     # A smaller alpha means stronger filtering, i.e. more smooth but also larger latency
-    low_pass_alpha: 0.3
+    low_pass_alpha: 0.4
 
   control:
     type: pinocchio

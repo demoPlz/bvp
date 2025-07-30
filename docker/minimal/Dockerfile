@@ -51,7 +51,7 @@ RUN pip install torch --extra-index-url https://download.pytorch.org/whl/cpu \
 RUN pip install pycollada
 
 # Git clone and install
-RUN cd /server && git clone https://github.com/demoPlz/bvp.git bunny_teleop_server && chmod +x /server/bunny_teleop_server/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
+RUN cd /server && git clone --depth=1  https://github.com/demoPlz/bvp.git bunny_teleop_server && chmod +x /server/bunny_teleop_server/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
 
 
 RUN cd bunny_teleop_server && pip install . --use-deprecated legacy-resolver && chmod +x /usr/local/lib/python3.10/dist-packages/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
