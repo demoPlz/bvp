@@ -91,8 +91,8 @@ class PinocchioMotionControl(BaseMotionControl):
             if np.linalg.norm(err) < self.ik_eps:
                 break
 
-            JLog = pin.Jlog6(iMd.inverse())
-            J = -JLog@J
+            # JLog = pin.Jlog6(iMd.inverse())
+            # J = -JLog@J
 
             v = J.T.dot(np.linalg.solve(J.dot(J.T) + self.ik_damping, err))
             qpos = pin.integrate(self.model, qpos, v * self.dt)
