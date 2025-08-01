@@ -11,7 +11,7 @@ right:
     target_joint_names: null
     target_origin_link_names: ["gripper_left" ]
     target_task_link_names: [ "gripper_right" ]
-    scaling_factor: 3.0
+    scaling_factor: 1.0
 
     # Source refers to the retargeting input, which corresponds to the human hand
     # Map thumb tip (index 4) and index finger tip (index 8) to gripper fingers
@@ -36,7 +36,7 @@ right:
     disable_orientation_control: False
 
     # Set to a smaller value for first trial before you are familiar with the system
-    motion_scaling_factor: 0.5
+    motion_scaling_factor: 1.0
 
 left:
   retargeting:
@@ -51,7 +51,7 @@ left:
     target_joint_names: null
     target_origin_link_names: [ "gripper_right" ]
     target_task_link_names: [ "gripper_left" ]
-    scaling_factor: 3.0
+    scaling_factor: 1.0
 
     # Source refers to the retargeting input, which corresponds to the human hand
     # Map thumb tip (index 4) and index finger tip (index 8) to gripper fingers
@@ -76,4 +76,4 @@ left:
     disable_orientation_control: False
 
     # Set to a smaller value for first trial before you are familiar with the system
-    motion_scaling_factor: 0.5
+    motion_scaling_factor: 1.0

@@ -34,6 +34,12 @@ class PinocchioMotionControl(BaseMotionControl):
         self.dt = float(cfg["dt"])
         self.ee_name = ee_name
 
+        print("Pinocchio Configurations : ")
+        print(f"End Effector Name: {self.ee_name}")
+        print(f"IK Damping: {self.ik_damping}")
+        print(f"IK Epsilon: {self.ik_eps}")
+        print(f"Time Step: {self.dt}")
+
         # Build robot
         urdf_path = self.get_urdf_absolute_path(cfg, robot_config_path)
         self.model: pin.Model = pin.buildModelFromUrdf(str(urdf_path),mimic=False)
@@ -50,7 +56,7 @@ class PinocchioMotionControl(BaseMotionControl):
 
 
 
-        print(pin.neutral(self.model).shape[0])
+        # print(pin.neutral(self.model).shape[0])
 
         for i, frame in enumerate(self.model.frames):
             frame_mapping[frame.name] = i
@@ -84,6 +90,9 @@ class PinocchioMotionControl(BaseMotionControl):
             err = pin.log(iMd).vector
             if np.linalg.norm(err) < self.ik_eps:
                 break
+
+            JLog = pin.Jlog6(iMd.inverse())
+            J = -JLog@J
 
             v = J.T.dot(np.linalg.solve(J.dot(J.T) + self.ik_damping, err))
             qpos = pin.integrate(self.model, qpos, v * self.dt)
