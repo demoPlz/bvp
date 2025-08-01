@@ -107,10 +107,13 @@ class VisionProHandDetector(Node):
         # Setup avp communication
         self.avp_address = vision_pro_ip
         self.latest_transformation = None
-        self.axis_transform = np.array(
-            [[0, 0, -1], [-1, 0, 0], [0, 1, 0]], dtype=np.float64
-        )
+        # self.axis_transform = np.array(
+        #     [[0, 0, -1], [-1, 0, 0], [0, 1, 0]], dtype=np.float64
+        # )
 
+        self.axis_transform = np.array(
+            [[-1,0,0],[0,1,0],[0,0,-1]], dtype=np.float64
+        )
         # Camera information
         self.base_frame_name = f"{vision_pro_name}_base_frame"
 
