@@ -9,9 +9,11 @@ MANO2ROBOT = np.array(
     ]
 )
 
+
+
 OPERATOR2MANO_RIGHT = np.array(
     [
-        [0, 0, -1],
+        [0, 0, 1],
         [-1, 0, 0],
         [0, 1, 0],
     ]
@@ -19,21 +21,15 @@ OPERATOR2MANO_RIGHT = np.array(
 
 OPERATOR2MANO_LEFT = np.array(
     [
-        [0, 0, -1],
-        [1, 0, 0],
-        [0, -1, 0],
+        [0, 0, 1],
+        [-1, 0, 0],
+        [0, 1, 0],
     ]
 )
 
 OPERATOR2AVP_RIGHT = OPERATOR2MANO_RIGHT
 
-OPERATOR2AVP_LEFT = np.array(
-    [
-        [0, 0, 1],
-        [1, 0, 0],
-        [0, 1, 0],
-    ]
-)
+OPERATOR2AVP_LEFT = OPERATOR2MANO_LEFT
 
 
 def project_average_rotation(quat_list: np.ndarray):

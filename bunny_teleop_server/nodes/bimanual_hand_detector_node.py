@@ -111,9 +111,15 @@ class VisionProHandDetector(Node):
         #     [[0, 0, -1], [-1, 0, 0], [0, 1, 0]], dtype=np.float64
         # )
 
+        # self.axis_transform = np.array(
+        #     [[-1,0,0],[0,1,0],[0,0,-1]], dtype=np.float64
+        # )
+
         self.axis_transform = np.array(
-            [[-1,0,0],[0,1,0],[0,0,-1]], dtype=np.float64
-        )
+             [[0, 0, -1], [-1, 0, 0], [0, 1, 0]], dtype=np.float64
+         )
+
+
         # Camera information
         self.base_frame_name = f"{vision_pro_name}_base_frame"
 
