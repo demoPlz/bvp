@@ -99,6 +99,7 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
             np.zeros(7),
             np.zeros([7]),
         )  # EE pose at each robot arm's base
+        self.initial_ee_orientation = (np.zeros(4), np.zeros(4))
         self.client_lock = Lock()
 
         # Wait for the first initialization config to come
@@ -159,6 +160,7 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
             )
 
             self.client_ee_pose[hand_index][:] = motion_control_ee_pose
+            self.initial_ee_orientation[hand_index][:] = motion_control_ee_pose[3:7]
             init_ee_poses.append(motion_control_ee_pose)
 
         # Setup transformation matrix between robot and world
@@ -449,7 +451,11 @@ class SingleArmHandNode:
                 rotations.q_prod_vector(self.init2base[3:7], ee_pos)
                 + self.init2base[0:3]
             )
+            initial_robot_ee_quat = self.node.initial_ee_orientation[self.hand_index]
+            # ee_quat = rotations.concatenate_quaternions(initial_robot_ee_quat, ee_quat)
+            initial_robot_ee_quat = self.node.initial_ee_orientation[self.hand_index]
             ee_quat = rotations.concatenate_quaternions(self.init2base[3:7], ee_quat)
+            ee_quat = rotations.concatenate_quaternions(initial_robot_ee_quat,ee_quat)
 
             filter_ee_pos = self.wrist_pos_filter.next(ee_pos)
             filter_ee_quat = self.wrist_rot_filter.next(ee_quat)

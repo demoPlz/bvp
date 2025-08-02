@@ -49,8 +49,8 @@ left:
 
     # Target refers to the retargeting target, which is the robot gripper
     target_joint_names: null
-    target_origin_link_names: [ "gripper_right" ]
-    target_task_link_names: [ "gripper_left" ]
+    target_origin_link_names: [ "gripper_left" ]
+    target_task_link_names: [ "gripper_right" ]
     scaling_factor: 1.0
 
     # Source refers to the retargeting input, which corresponds to the human hand
