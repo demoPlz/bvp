@@ -11,7 +11,7 @@ right:
     target_joint_names: null
     target_origin_link_names: ["gripper_left" ]
     target_task_link_names: [ "gripper_right" ]
-    scaling_factor: 1.0
+    scaling_factor: 0.8
 
     # Source refers to the retargeting input, which corresponds to the human hand
     # Map thumb tip (index 4) and index finger tip (index 8) to gripper fingers
@@ -19,7 +19,7 @@ right:
 
     # Low pass filter for gripper
     # A smaller alpha means stronger filtering, i.e. more smooth but also larger latency
-    low_pass_alpha: 0.3
+    low_pass_alpha: 0.5
 
   control:
     type: pinocchio
@@ -36,7 +36,7 @@ right:
     disable_orientation_control: False
 
     # Set to a smaller value for first trial before you are familiar with the system
-    motion_scaling_factor: 1.0
+    motion_scaling_factor: 0.8
 
 left:
   retargeting:
@@ -51,7 +51,7 @@ left:
     target_joint_names: null
     target_origin_link_names: [ "gripper_left" ]
     target_task_link_names: [ "gripper_right" ]
-    scaling_factor: 1.0
+    scaling_factor: 0.8
 
     # Source refers to the retargeting input, which corresponds to the human hand
     # Map thumb tip (index 4) and index finger tip (index 8) to gripper fingers
@@ -59,7 +59,7 @@ left:
 
     # Low pass filter for gripper
     # A smaller alpha means stronger filtering, i.e. more smooth but also larger latency
-    low_pass_alpha: 0.4
+    low_pass_alpha: 0.5
 
   control:
     type: pinocchio
@@ -76,4 +76,4 @@ left:
     disable_orientation_control: False
 
     # Set to a smaller value for first trial before you are familiar with the system
-    motion_scaling_factor: 1.0
+    motion_scaling_factor: 0.8

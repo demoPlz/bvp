@@ -25,6 +25,15 @@ RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-i
   libassimp-dev \
   liburdfdom-dev
 
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz && \
+  tar -C /opt -xzf nvim-linux-x86_64.tar.gz && \
+  rm nvim-linux-x86_64.tar.gz
+
+ENV PATH ${PATH}:/opt/nvim-linux-x86_64/bin
+
+RUN git clone --depth=1 -b master https://github.com/perseusdg/config_files.git && \
+  cd config_files && chmod +x install.sh && sh install.sh
+
 RUN cd /server && git clone --recursive --depth=1 -b master https://github.com/stack-of-tasks/eigenpy.git && cd eigenpy && \
   mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j12 && make install
 
@@ -51,7 +60,7 @@ RUN pip install torch --extra-index-url https://download.pytorch.org/whl/cpu \
 RUN pip install pycollada
 
 # Git clone and install
-RUN cd /server && git clone --depth=1  https://github.com/demoPlz/bvp.git bunny_teleop_server && chmod +x /server/bunny_teleop_server/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
+RUN cd /server && git clone https://github.com/demoPlz/bvp.git bunny_teleop_server && chmod +x /server/bunny_teleop_server/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
 
 
 RUN cd bunny_teleop_server && pip install . --use-deprecated legacy-resolver && chmod +x /usr/local/lib/python3.10/dist-packages/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
