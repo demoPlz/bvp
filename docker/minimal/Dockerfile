@@ -23,7 +23,8 @@ RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-i
   python3-scipy \
   python3-dev \
   libassimp-dev \
-  liburdfdom-dev
+  liburdfdom-dev \
+  zsh
 
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz && \
   tar -C /opt -xzf nvim-linux-x86_64.tar.gz && \
@@ -68,7 +69,7 @@ RUN cd bunny_teleop_server && pip install . --use-deprecated legacy-resolver && 
 
 
 # Build ROS and chmod the file
-RUN /bin/bash -c ". /opt/ros/humble/setup.bash && cd /server/bunny_teleop_server/ros && colcon clean workspace -y && colcon build"
+RUN /bin/zsh -c ". /opt/ros/humble/setup.zsh && cd /server/bunny_teleop_server/ros && colcon clean workspace -y && colcon build"
 
 
 
