@@ -30,13 +30,13 @@ right:
     robot_config_path: wxai_base_right.yml
 
     # Low pass filter for arm (not applicable for gripper-only setup)
-    low_pass_alpha: 0.05
+    low_pass_alpha: 0.01
 
     # Set True if you do not want to control the orientation of gripper
     disable_orientation_control: False
 
     # Set to a smaller value for first trial before you are familiar with the system
-    motion_scaling_factor: 0.8
+    motion_scaling_factor: 0.5
 
 left:
   retargeting:
@@ -49,8 +49,8 @@ left:
 
     # Target refers to the retargeting target, which is the robot gripper
     target_joint_names: null
-    target_origin_link_names: [ "gripper_left" ]
-    target_task_link_names: [ "gripper_right" ]
+    target_origin_link_names: [ "gripper_right" ]
+    target_task_link_names: [ "gripper_left" ]
     scaling_factor: 0.8
 
     # Source refers to the retargeting input, which corresponds to the human hand
@@ -70,10 +70,10 @@ left:
     robot_config_path: wxai_base_left.yml
 
     # Low pass filter for arm (not applicable for gripper-only setup)
-    low_pass_alpha: 0.05
+    low_pass_alpha: 0.01
 
     # Set True if you do not want to control the orientation of gripper
     disable_orientation_control: False
 
     # Set to a smaller value for first trial before you are familiar with the system
-    motion_scaling_factor: 0.8
+    motion_scaling_factor: 0.5

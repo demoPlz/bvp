@@ -273,14 +273,14 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
     def publish_periodically(self):
         if self.initialized:
             with self.left_hand_arm.motion_control_lock:
-                self.client_qpos[0][self.left_hand_arm.index_client2control[:7]] = (
-                    self.left_hand_arm.last_control_qpos[:7]
+                self.client_qpos[0][self.left_hand_arm.index_client2control[:6]] = (
+                    self.left_hand_arm.last_control_qpos[:6]
                 )
                 left_ee_target_pose = self.left_hand_arm.last_target_ee_pose
 
             with self.right_hand_arm.motion_control_lock:
-                self.client_qpos[1][self.right_hand_arm.index_client2control[:7]] = (
-                    self.right_hand_arm.last_control_qpos[:7]
+                self.client_qpos[1][self.right_hand_arm.index_client2control[:6]] = (
+                    self.right_hand_arm.last_control_qpos[:6]
                 )
                 right_ee_target_pose = self.right_hand_arm.last_target_ee_pose
 
