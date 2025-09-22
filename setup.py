@@ -24,7 +24,7 @@ core_requirements = [
     # Build from source to avoid prebuilt wheels
     "dex_retargeting @ git+https://github.com/dexsuite/dex-retargeting.git",
     "sim_web_visualizer",
-    "bunny_teleop",
+    "bunny_teleop @ https://github.com/perseusdg/BunnyVisionPro.git"
 ]
 
 classifiers = [
@@ -49,7 +49,7 @@ def setup_package():
     author = "BunnyVisionPro"
     author_email = ""
     description = "Teleoperation server for bimanual robot arms + hands."
-    url = "https://github.com/Dingry/bunny_teleop_server"
+    url = "https://github.com/perseusdg/BunnyVisionPro.git"
     with open(_here / "README.md", "r") as file:
         readme = file.read()
 
