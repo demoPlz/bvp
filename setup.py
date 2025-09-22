@@ -24,7 +24,7 @@ core_requirements = [
     # Build from source to avoid prebuilt wheels
     "dex_retargeting @ git+https://github.com/dexsuite/dex-retargeting.git",
     "sim_web_visualizer",
-    "bunny_teleop @ https://github.com/perseusdg/BunnyVisionPro.git"
+    "bunny_teleop @ git+https://github.com/perseusdg/BunnyVisionPro.git"
 ]
 
 classifiers = [
