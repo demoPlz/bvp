@@ -21,7 +21,8 @@ core_requirements = [
     "pytransform3d",
     "avp_stream",
     # Our own packages
-    "dex_retargeting",
+    # Build from source to avoid prebuilt wheels
+    "dex_retargeting @ git+https://github.com/dexsuite/dex-retargeting.git",
     "sim_web_visualizer",
     "bunny_teleop",
 ]
