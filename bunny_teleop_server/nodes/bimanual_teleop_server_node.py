@@ -102,6 +102,17 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
         self.initial_ee_orientation = (np.zeros(4), np.zeros(4))
         self.client_lock = Lock()
 
+        # Background timer to sync robot state (measured) -> motion control
+        # This keeps Pinocchio's internal state aligned with the robot
+        self._state_sync_group = MutuallyExclusiveCallbackGroup()
+        self.state_update_dt = 1 / 60
+        self.state_update_timer = self.create_timer(
+            self.state_update_dt,
+            self.handle_robot_state_update,
+            callback_group=self._state_sync_group,
+        )
+        self.state_update_timer.cancel()
+
         # Wait for the first initialization config to come
         init_config = self.teleop_server.wait_for_init_config()
         self.apply_teleop_init_config(init_config)
@@ -292,6 +303,55 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
 
             self.teleop_server.send_teleop_cmd(qpos, ee_pose)
 
+    def handle_robot_state_update(self):
+        """
+        Periodically pull latest robot state from TeleopServer and update the
+        motion controllers' current qpos to match the measured robot state.
+
+        This ensures Pinocchio's internal state stays in sync with reality.
+        """
+        if not self.initialized:
+            return
+
+        state = self.teleop_server.last_robot_state
+        if not state:
+            return
+
+        qpos_tuple = state.get("qpos") if isinstance(state, dict) else None
+        if qpos_tuple is None:
+            return
+
+        try:
+            left_q_client = np.asarray(qpos_tuple[0]) if qpos_tuple[0] is not None else None
+            right_q_client = np.asarray(qpos_tuple[1]) if qpos_tuple[1] is not None else None
+
+            # Left arm sync
+            if (
+                left_q_client is not None
+                and self.left_hand_arm.index_client2control is not None
+                and left_q_client.shape[0] > 0
+                and left_q_client.shape[0] > int(np.max(self.left_hand_arm.index_client2control))
+            ):
+                left_q_control = left_q_client[self.left_hand_arm.index_client2control]
+                self.left_hand_arm.set_control_qpos(left_q_control)
+
+            # Right arm sync
+            if (
+                right_q_client is not None
+                and self.right_hand_arm.index_client2control is not None
+                and right_q_client.shape[0] > 0
+                and right_q_client.shape[0] > int(np.max(self.right_hand_arm.index_client2control))
+            ):
+                right_q_control = right_q_client[self.right_hand_arm.index_client2control]
+                self.right_hand_arm.set_control_qpos(right_q_control)
+
+        except Exception as e:
+            # Keep running even if a single bad packet arrives
+            try:
+                self.get_logger().warn(f"Robot state sync failed: {e}")
+            except Exception:
+                pass
+
     def viz_periodically(self):
         if self.initialized:
             with self.client_lock:
@@ -319,6 +379,7 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
         self.left_hand_arm.start()
         self.right_hand_arm.start()
         self.publish_timer.reset()
+        self.state_update_timer.reset()
         if self.use_web_viz:
             self.viz_timer.reset()
 
@@ -359,6 +420,7 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
         if self.use_web_viz:
             self.viz_timer.cancel()
         self.publish_timer.cancel()
+        self.state_update_timer.cancel()
         self.left_hand_arm.clean_up()
         self.right_hand_arm.clean_up()
         self.left_hand_arm.retargeting.reset()

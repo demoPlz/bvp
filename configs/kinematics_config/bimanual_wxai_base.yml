@@ -36,7 +36,7 @@ right:
     disable_orientation_control: False
 
     # Set to a smaller value for first trial before you are familiar with the system
-    motion_scaling_factor: 0.5
+    motion_scaling_factor: 0.7
 
 left:
   retargeting:
@@ -76,4 +76,4 @@ left:
     disable_orientation_control: False
 
     # Set to a smaller value for first trial before you are familiar with the system
-    motion_scaling_factor: 0.5
+    motion_scaling_factor: 0.7
