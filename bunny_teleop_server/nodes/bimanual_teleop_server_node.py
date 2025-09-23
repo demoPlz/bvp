@@ -20,6 +20,7 @@ from bunny_teleop_server.utils.robot_utils import (
     LPFilter,
     LPRotationFilter,
     FRONT_FACING_MIRROR_ROT,
+    FRONT_FACING_AXIS_MIRROR,
 )
 
 
@@ -522,15 +523,29 @@ class SingleArmHandNode:
                 ee_pos = FRONT_FACING_MIRROR_ROT @ ee_pos
                 if not self.disable_orientation_control:
                     ee_rot = rotations.matrix_from_quaternion(ee_quat)
+                    axis_angle = rotations.axis_angle_from_matrix(ee_rot)
+                    axis = axis_angle[:3]
+                    angle = axis_angle[3]
+                    axis_norm = np.linalg.norm(axis)
+                    if axis_norm > 1e-8:
+                        axis = axis / axis_norm
+                        axis = FRONT_FACING_AXIS_MIRROR @ axis
+                        mirrored_quat = rotations.quaternion_from_axis_angle(
+                            np.concatenate([axis, [angle]])
+                        )
+                    else:
+                        mirrored_quat = ee_quat.copy()
+
+                    mirrored_rot = rotations.matrix_from_quaternion(mirrored_quat)
                     yaw_pitch_roll = rotations.euler_from_matrix(
-                        ee_rot, 2, 1, 0, extrinsic=False
+                        mirrored_rot, 2, 1, 0, extrinsic=False
                     )
-                    yaw_pitch_roll[0] *= -1.0  # yaw
-                    yaw_pitch_roll[1] *= -1.0  # pitch
-                    mirrored_rot = rotations.matrix_from_euler(
-                        yaw_pitch_roll, 2, 1, 0, extrinsic=False
+                    yaw_pitch_roll[2] *= -1.0  # restore roll direction
+                    ee_quat = rotations.quaternion_from_matrix(
+                        rotations.matrix_from_euler(
+                            yaw_pitch_roll, 2, 1, 0, extrinsic=False
+                        )
                     )
-                    ee_quat = rotations.quaternion_from_matrix(mirrored_rot)
 
             ee_pos = (
                 rotations.q_prod_vector(self.init2base[3:7], ee_pos)

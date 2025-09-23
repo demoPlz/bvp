@@ -1,7 +1,7 @@
 communication:
   operator_name: test_user
   viz_type: sim_web_visualizer
-  viz_host: localhost
+  viz_host: 127.0.0.1
   viz_port: 6000
   viz_urdf_paths:
     - assembly/wxai_base/wxai_arm_left.urdf

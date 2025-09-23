@@ -51,6 +51,15 @@ FRONT_FACING_MIRROR_ROT = np.array(
     ]
 )
 
+# Axis reflection used for orientation mirroring
+FRONT_FACING_AXIS_MIRROR = np.array(
+    [
+        [-1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, -1.0],
+    ]
+)
+
 
 
 def project_average_rotation(quat_list: np.ndarray):
