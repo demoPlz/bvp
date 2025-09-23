@@ -16,7 +16,11 @@ from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallb
 from bunny_teleop_server.communication.visualizer_base import TeleopVisualizerBase
 from bunny_teleop_server.control.base import BaseMotionControl
 from bunny_teleop_server.nodes.bimanual_hand_monitor_node import BimanualMonitorNode
-from bunny_teleop_server.utils.robot_utils import LPFilter, LPRotationFilter
+from bunny_teleop_server.utils.robot_utils import (
+    LPFilter,
+    LPRotationFilter,
+    FRONT_FACING_MIRROR_ROT,
+)
 
 
 class BimanualRobotTeleopNode(BimanualMonitorNode):
@@ -31,6 +35,7 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
         low_pass_smoothing_wrist=(0.1, 0.1),
         disable_orientation_control=(False, False),
         motion_scaling_factor=(1.0, 1.0),
+        mirror_operator_view=True,
         teleop_host="localhost",
         verbose=False,
     ):
@@ -52,6 +57,7 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
             low_pass_smoothing_wrist=low_pass_smoothing_wrist[0],
             motion_control=motion_controls[0],
             disable_orientation_control=disable_orientation_control[0],
+            mirror_operator_view=mirror_operator_view,
             motion_scaling_factor=motion_scaling_factor[0],
         )
         self.right_hand_arm = SingleArmHandNode(
@@ -61,6 +67,7 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
             low_pass_smoothing_wrist=low_pass_smoothing_wrist[1],
             motion_control=motion_controls[1],
             disable_orientation_control=disable_orientation_control[1],
+            mirror_operator_view=mirror_operator_view,
             motion_scaling_factor=motion_scaling_factor[1],
         )
 
@@ -437,6 +444,7 @@ class SingleArmHandNode:
         low_pass_smoothing_wrist: float,
         motion_control: Optional[BaseMotionControl],
         disable_orientation_control: bool,
+        mirror_operator_view: bool,
         motion_scaling_factor: float,
     ):
         self.hand_index = 0 if "left" in hand_type else 1
@@ -461,6 +469,7 @@ class SingleArmHandNode:
         # If motion_control is None, then we only use retargeted result for teleoperation
         # For example, in-hand manipulation with only a box, no online collision detection is necessary
         self.disable_orientation_control = disable_orientation_control
+        self.mirror_operator_view = mirror_operator_view
         self.motion_scaling_factor = motion_scaling_factor
         self.action_update_dt = 1 / 60
         self.motion_control = motion_control
@@ -508,6 +517,20 @@ class SingleArmHandNode:
                 ee_quat = np.array([1, 0, 0, 0])
             else:
                 ee_quat = ee_poses[self.hand_index][3:7]
+
+            if self.mirror_operator_view:
+                ee_pos = FRONT_FACING_MIRROR_ROT @ ee_pos
+                if not self.disable_orientation_control:
+                    ee_rot = rotations.matrix_from_quaternion(ee_quat)
+                    yaw_pitch_roll = rotations.euler_from_matrix(
+                        ee_rot, 2, 1, 0, extrinsic=False
+                    )
+                    yaw_pitch_roll[0] *= -1.0  # yaw
+                    yaw_pitch_roll[1] *= -1.0  # pitch
+                    mirrored_rot = rotations.matrix_from_euler(
+                        yaw_pitch_roll, 2, 1, 0, extrinsic=False
+                    )
+                    ee_quat = rotations.quaternion_from_matrix(mirrored_rot)
 
             ee_pos = (
                 rotations.q_prod_vector(self.init2base[3:7], ee_pos)

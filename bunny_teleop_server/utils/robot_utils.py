@@ -42,6 +42,16 @@ OPERATOR2AVP_LEFT = np.array(
 
 
 
+# 180 deg rotation about gravity to mirror operator view when facing the robot
+FRONT_FACING_MIRROR_ROT = np.array(
+    [
+        [-1.0, 0.0, 0.0],
+        [0.0, -1.0, 0.0],
+        [0.0, 0.0, 1.0],
+    ]
+)
+
+
 
 def project_average_rotation(quat_list: np.ndarray):
     gravity_dir = np.array([0, 0, -1])
