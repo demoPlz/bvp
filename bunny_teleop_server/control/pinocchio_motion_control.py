@@ -75,12 +75,19 @@ class PinocchioMotionControl(BaseMotionControl):
             self.model, self.data, self.ee_frame_id
         )
 
+        self.lower = self.model.lowerPositionLimit.copy()
+        self.upper = self.model.upperPositionLimit.copy()
+        self.has_lower = np.isfinite(self.lower)
+        self.has_upper = np.isfinite(self.upper)
+        self.max_joint_step = np.deg2rad(10.0)
+
     def step(self, pos: Optional[np.ndarray], quat: Optional[np.ndarray], repeat=1):
         xyzw = np.array([quat[1], quat[2], quat[3], quat[0]])
         pose_vec = np.concatenate([pos, xyzw])
         oMdes = pin.XYZQUATToSE3(pose_vec)
         with self._qpos_lock:
             qpos = self.qpos.copy()
+        prev_err_norm = None
 
         for k in range(100 * repeat):
             pin.forwardKinematics(self.model, self.data, qpos)
@@ -88,14 +95,29 @@ class PinocchioMotionControl(BaseMotionControl):
             J = pin.computeFrameJacobian(self.model, self.data, qpos, self.ee_frame_id)
             iMd = ee_pose.actInv(oMdes)
             err = pin.log(iMd).vector
-            if np.linalg.norm(err) < self.ik_eps:
+            err_norm = np.linalg.norm(err)
+            if err_norm < self.ik_eps:
                 break
 
             # JLog = pin.Jlog6(iMd.inverse())
             # J = -JLog@J
 
             v = J.T.dot(np.linalg.solve(J.dot(J.T) + self.ik_damping, err))
-            qpos = pin.integrate(self.model, qpos, v * self.dt)
+            step = np.clip(v * self.dt, -self.max_joint_step, self.max_joint_step)
+            qpos = pin.integrate(self.model, qpos, step)
+
+            if self.has_lower.any():
+                qpos[self.has_lower] = np.maximum(
+                    qpos[self.has_lower], self.lower[self.has_lower]
+                )
+            if self.has_upper.any():
+                qpos[self.has_upper] = np.minimum(
+                    qpos[self.has_upper], self.upper[self.has_upper]
+                )
+
+            if prev_err_norm is not None and err_norm >= prev_err_norm * 0.999:
+                break
+            prev_err_norm = err_norm
 
         self.set_current_qpos(qpos)
 
@@ -116,9 +138,16 @@ class PinocchioMotionControl(BaseMotionControl):
             return self.qpos.copy()
 
     def set_current_qpos(self, qpos: np.ndarray):
-        print("Pinocchio shape : ")
-
-        print(pin.neutral(self.model).shape[0])
+        if self.has_lower.any() or self.has_upper.any():
+            qpos = qpos.copy()
+            if self.has_lower.any():
+                qpos[self.has_lower] = np.maximum(
+                    qpos[self.has_lower], self.lower[self.has_lower]
+                )
+            if self.has_upper.any():
+                qpos[self.has_upper] = np.minimum(
+                    qpos[self.has_upper], self.upper[self.has_upper]
+                )
         with self._qpos_lock:
             self.qpos = qpos
             pin.forwardKinematics(self.model, self.data, self.qpos)

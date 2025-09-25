@@ -15,6 +15,12 @@ from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallb
 
 from bunny_teleop_server.communication.visualizer_base import TeleopVisualizerBase
 from bunny_teleop_server.control.base import BaseMotionControl
+from bunny_teleop_server.control.safety import (
+    ArmState,
+    BimanualSafetyManager,
+    load_safety_config,
+    resolve_safety_config_path,
+)
 from bunny_teleop_server.nodes.bimanual_hand_monitor_node import BimanualMonitorNode
 from bunny_teleop_server.utils.robot_utils import (
     LPFilter,
@@ -39,6 +45,7 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
         mirror_operator_view=True,
         teleop_host="localhost",
         verbose=False,
+        safety_config_path: Optional[str] = None,
     ):
         super().__init__(
             detection_topic_name,
@@ -71,6 +78,14 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
             mirror_operator_view=mirror_operator_view,
             motion_scaling_factor=motion_scaling_factor[1],
         )
+
+        cfg_path = resolve_safety_config_path(safety_config_path)
+        rect_l, rect_r, hband, pillars_l, pillars_r, params = load_safety_config(
+            cfg_path
+        )
+        self.safety = BimanualSafetyManager(rect_l, rect_r, hband, pillars_l, pillars_r, params)
+        self.safety_config_path = str(cfg_path)
+        print(f"Safety config loaded from {self.safety_config_path}")
 
         # Server publisher
         self._teleop_publish_group = MutuallyExclusiveCallbackGroup()
@@ -557,8 +572,24 @@ class SingleArmHandNode:
             ee_quat = rotations.concatenate_quaternions(self.init2base[3:7], ee_quat)
             ee_quat = rotations.concatenate_quaternions(initial_robot_ee_quat,ee_quat)
 
-            filter_ee_pos = self.wrist_pos_filter.next(ee_pos)
-            filter_ee_quat = self.wrist_rot_filter.next(ee_quat)
+            other = (
+                self.node.right_hand_arm
+                if self.hand_index == 0
+                else self.node.left_hand_arm
+            )
+            other_state = (
+                other.get_state_for_collision() if other is not None else None
+            )
+            safe_pos, safe_quat, _ = self.node.safety.filter_target(
+                arm_index=self.hand_index,
+                target_pos=ee_pos,
+                target_quat=ee_quat,
+                other_arm_state=other_state,
+                dt=self.action_update_dt,
+            )
+
+            filter_ee_pos = self.wrist_pos_filter.next(safe_pos)
+            filter_ee_quat = self.wrist_rot_filter.next(safe_quat)
 
             # Combine with simulated environment
             target_ee_pose = np.concatenate([filter_ee_pos, filter_ee_quat])
@@ -582,6 +613,13 @@ class SingleArmHandNode:
 
     def set_optimizer_index(self, indices: np.ndarray):
         self.index_client2optimizer = indices
+
+    def get_state_for_collision(self) -> Optional[ArmState]:
+        if self.motion_control is None:
+            return None
+        qpos = self.motion_control.get_current_qpos()
+        ee = self.motion_control.compute_ee_pose(qpos)
+        return ArmState(ee_pos=ee[:3].copy(), ee_quat=ee[3:7].copy())
 
     def start(self):
         self.action_timer.reset()

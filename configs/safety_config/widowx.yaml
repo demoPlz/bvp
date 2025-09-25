@@ -1,0 +1,52 @@
+# Safety settings for the WidowX bimanual cage.
+# Distances are in meters. Ranges may be specified either in radians or degrees
+# (use *_deg keys for readability).
+rectangles:
+  left:
+    x: [-0.028575, 0.2794]
+    y: [-0.2286, 0.2286]
+  right:
+    x: [-0.028575, 0.2794]
+    y: [-0.2286, 0.2286]
+height_band:
+  z: [0.0254, 0.3556]
+pillars:
+  left:
+    - center: [-0.028575, -0.2286]
+      radius: 0.01905
+      margin: 0.0254
+    - center: [-0.028575, 0.2286]
+      radius: 0.01905
+      margin: 0.0254
+    - center: [0.2794, -0.2286]
+      radius: 0.01905
+      margin: 0.0254
+    - center: [0.2794, 0.2286]
+      radius: 0.01905
+      margin: 0.0254
+  right:
+    - center: [-0.028575, -0.2286]
+      radius: 0.01905
+      margin: 0.0254
+    - center: [-0.028575, 0.2286]
+      radius: 0.01905
+      margin: 0.0254
+    - center: [0.2794, -0.2286]
+      radius: 0.01905
+      margin: 0.0254
+    - center: [0.2794, 0.2286]
+      radius: 0.01905
+      margin: 0.0254
+params:
+  yaw_range_deg: [-90.0, 90.0]
+  pitch_range_deg: [-70.0, 70.0]
+  roll_range_deg: [-60.0, 60.0]
+  forward_axis: 0
+  world_forward: [1.0, 0.0, 0.0]
+  world_up: [0.0, 0.0, 1.0]
+  max_forward_tilt_deg: 75.0
+  v_max_pos: 0.4
+  v_max_rot_deg: 150.0
+  boundary_slowdown_dist: 0.03
+  hold_on_violation: true
+  inter_arm_min_dist: 0.14

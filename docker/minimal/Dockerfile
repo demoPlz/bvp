@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM ros:humble
 
 # Language setup
@@ -13,6 +14,7 @@ RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-i
   python3-pip \
   curl \
   git \
+  openssh-client \
   wget \
   vim \
   unzip \
@@ -25,6 +27,10 @@ RUN apt-get update && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-i
   libassimp-dev \
   liburdfdom-dev \
   zsh
+
+# Prepare SSH known_hosts to avoid interactive host key prompt for GitHub
+RUN mkdir -p -m 0700 /root/.ssh \
+  && ssh-keyscan -H github.com >> /root/.ssh/known_hosts
 
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz && \
   tar -C /opt -xzf nvim-linux-x86_64.tar.gz && \
@@ -50,7 +56,7 @@ RUN echo '\
   if [ -d "/server/bunny_teleop_server" ] \n\
   then \n\
   source /server/bunny_teleop_server/ros/install/local_setup.bash \n\
-  fi \n' >> $HOME/.bashrc
+  fi \n' >> $HOME/.zshrc
 
 
 
@@ -61,15 +67,17 @@ RUN pip install torch --extra-index-url https://download.pytorch.org/whl/cpu \
 RUN pip install pycollada
 
 # Git clone and install
-RUN cd /server && git clone https://github.com/demoPlz/bvp.git bunny_teleop_server && chmod +x /server/bunny_teleop_server/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
+RUN cd /server && git clone https://github.com/demoPlz/bvp.git   bunny_teleop_server && chmod +x /server/bunny_teleop_server/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
 
 
-RUN cd bunny_teleop_server && pip install . --use-deprecated legacy-resolver && chmod +x /usr/local/lib/python3.10/dist-packages/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
+# Mount the SSH agent during pip install so git+ssh dependencies can be fetched
+RUN --mount=type=ssh cd bunny_teleop_server \
+  && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=accept-new" pip install . --no-deps  --use-deprecated legacy-resolver \
+  && chmod +x /usr/local/lib/python3.10/dist-packages/bunny_teleop_server/nodes/bimanual_hand_detector_node.py
 
 
 
 # Build ROS and chmod the file
 RUN /bin/zsh -c ". /opt/ros/humble/setup.zsh && cd /server/bunny_teleop_server/ros && colcon clean workspace -y && colcon build"
-
 
 
