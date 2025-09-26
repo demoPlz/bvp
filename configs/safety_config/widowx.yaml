@@ -3,38 +3,38 @@
 # (use *_deg keys for readability).
 rectangles:
   left:
-    x: [-0.028575, 0.2794]
+    x: [-0.3429, 0.3429]
     y: [-0.2286, 0.2286]
   right:
-    x: [-0.028575, 0.2794]
+    x: [-0.3429, 0.3429]
     y: [-0.2286, 0.2286]
 height_band:
   z: [0.0254, 0.3556]
 pillars:
   left:
-    - center: [-0.028575, -0.2286]
+    - center: [-0.3429, -0.2286]
       radius: 0.01905
       margin: 0.0254
-    - center: [-0.028575, 0.2286]
+    - center: [-0.3429, 0.2286]
       radius: 0.01905
       margin: 0.0254
-    - center: [0.2794, -0.2286]
+    - center: [0.3429, -0.2286]
       radius: 0.01905
       margin: 0.0254
-    - center: [0.2794, 0.2286]
+    - center: [0.3429, 0.2286]
       radius: 0.01905
       margin: 0.0254
   right:
-    - center: [-0.028575, -0.2286]
+    - center: [-0.3429, -0.2286]
       radius: 0.01905
       margin: 0.0254
-    - center: [-0.028575, 0.2286]
+    - center: [-0.3429, 0.2286]
       radius: 0.01905
       margin: 0.0254
-    - center: [0.2794, -0.2286]
+    - center: [0.3429, -0.2286]
       radius: 0.01905
       margin: 0.0254
-    - center: [0.2794, 0.2286]
+    - center: [0.3429, 0.2286]
       radius: 0.01905
       margin: 0.0254
 params:
@@ -49,4 +49,4 @@ params:
   v_max_rot_deg: 150.0
   boundary_slowdown_dist: 0.03
   hold_on_violation: true
-  inter_arm_min_dist: 0.14
+  inter_arm_min_dist: -1.0

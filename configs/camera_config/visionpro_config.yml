@@ -1,4 +1,4 @@
 cameras:
   - visionpro:
       type: visionpro
-      avp_ip: "10.131.188.48"
+      avp_ip: "10.131.245.127"

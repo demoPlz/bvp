@@ -45,7 +45,7 @@ OPERATOR2AVP_LEFT = np.array(
 # 180 deg rotation about gravity to mirror operator view when facing the robot
 FRONT_FACING_MIRROR_ROT = np.array(
     [
-        [-1.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
         [0.0, -1.0, 0.0],
         [0.0, 0.0, 1.0],
     ]

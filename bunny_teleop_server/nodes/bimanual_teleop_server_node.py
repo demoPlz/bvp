@@ -399,6 +399,14 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
             self.left_robot_viz.create_ee_target(ee_poses[0], self.robot_base_pose[0])
             self.right_robot_viz.create_ee_target(ee_poses[1], self.robot_base_pose[1])
 
+        # ---- Seed safety filter with current robot EE poses to prevent post-init "jump" ----
+        if hasattr(self, "safety"):
+            try:
+                self.safety.seed_last_cmd(0, self.left_hand_arm.get_state_for_collision())
+                self.safety.seed_last_cmd(1, self.right_hand_arm.get_state_for_collision())
+            except Exception:
+                pass
+
         self.left_hand_arm.start()
         self.right_hand_arm.start()
         self.publish_timer.reset()
@@ -572,14 +580,8 @@ class SingleArmHandNode:
             ee_quat = rotations.concatenate_quaternions(self.init2base[3:7], ee_quat)
             ee_quat = rotations.concatenate_quaternions(initial_robot_ee_quat,ee_quat)
 
-            other = (
-                self.node.right_hand_arm
-                if self.hand_index == 0
-                else self.node.left_hand_arm
-            )
-            other_state = (
-                other.get_state_for_collision() if other is not None else None
-            )
+            # Inter-arm spacing disabled per request
+            other_state = None
             safe_pos, safe_quat, _ = self.node.safety.filter_target(
                 arm_index=self.hand_index,
                 target_pos=ee_pos,
