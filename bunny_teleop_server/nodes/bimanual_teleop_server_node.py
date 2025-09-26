@@ -563,7 +563,6 @@ class SingleArmHandNode:
                     yaw_pitch_roll = rotations.euler_from_matrix(
                         mirrored_rot, 2, 1, 0, extrinsic=False
                     )
-                    yaw_pitch_roll[2] *= -1.0  # restore roll direction
                     ee_quat = rotations.quaternion_from_matrix(
                         rotations.matrix_from_euler(
                             yaw_pitch_roll, 2, 1, 0, extrinsic=False
