@@ -6,3 +6,27 @@ robot_cfg:
     ik_damping: 1e-3
     eps: 1e-3
     ee_link: link_6
+
+  # Optional: link-aware keep-out guard (planes & cylinders)
+  # Set enabled: true and tune frames/obstacles for your setup
+  collision_guard:
+    enabled: true
+    frame_names:
+      - link_2
+      - link_3
+      - link_4
+      - link_6
+    frame_radius_m: 0.025
+    max_backtrack: 10
+    min_scale: 1.0e-3
+    # Example obstacles (adjust to your base frame)
+    planes:
+      - name: right_wall
+        point: [0.0, 0.220, 0.0]
+        normal: [0.0, -1.0, 0.0]
+        margin: 0.010
+    cylinders:
+      - name: side_rod
+        center_xy: [0.250, 0.210]
+        radius: 0.010
+        margin: 0.015

@@ -9,6 +9,86 @@ import yaml
 from bunny_teleop_server.control.base import BaseMotionControl
 
 
+# --- Simple link-vs-obstacle guard (planes & cylinders) ---
+
+class _Plane:
+    def __init__(self, point, normal, margin):
+        self.point = np.asarray(point, float)
+        n = np.asarray(normal, float)
+        self.normal = n / (np.linalg.norm(n) + 1e-12)
+        self.margin = float(margin)
+
+    # Safe half-space is: (p - point)·normal >= radius + margin
+    def violation_amount(self, p, radius):
+        return (self.point - p).dot(self.normal) + radius + self.margin
+
+
+class _CylinderZ:
+    # Infinite cylinder along +Z with center in XY
+    def __init__(self, center_xy, radius, margin):
+        self.c = np.asarray(center_xy, float)
+        self.R = float(radius)
+        self.margin = float(margin)
+
+    # Positive => violation (inside keepout)
+    def violation_amount(self, p, radius):
+        d = np.hypot(p[0] - self.c[0], p[1] - self.c[1]) - (self.R + radius + self.margin)
+        return -d  # violate when d < 0
+
+
+class CollisionGuard:
+    def __init__(self, model, data, frame_mapping, cfg: dict):
+        self.model = model
+        self.data = data
+        # Which frames to monitor (origins are good proxies for link bodies)
+        names = cfg.get("frame_names", [])
+        self.frame_ids = [frame_mapping[n] for n in names if n in frame_mapping]
+        missing = [n for n in names if n not in frame_mapping]
+        if missing:
+            print("[CollisionGuard] Warning: frame(s) not found:", missing)
+
+        self.frame_radius = float(cfg.get("frame_radius_m", 0.02))  # ~2 cm default
+        self.max_backtrack = int(cfg.get("max_backtrack", 10))
+        self.min_scale = float(cfg.get("min_scale", 1e-3))
+
+        # Obstacles
+        self.planes = []
+        for pl in cfg.get("planes", []):
+            self.planes.append(_Plane(pl["point"], pl["normal"], pl.get("margin", 0.0)))
+        self.cyls = []
+        for cy in cfg.get("cylinders", []):
+            self.cyls.append(
+                _CylinderZ(cy["center_xy"], cy["radius"], cy.get("margin", 0.0))
+            )
+
+    def _is_safe_qpos(self, qpos) -> bool:
+        pin.forwardKinematics(self.model, self.data, qpos)
+        for fid in self.frame_ids:
+            oMf = pin.updateFramePlacement(self.model, self.data, fid)
+            p = oMf.translation  # world position of the frame origin
+            # Planes
+            for pl in self.planes:
+                if pl.violation_amount(p, self.frame_radius) > 0:
+                    return False
+            # Cylinders
+            for cy in self.cyls:
+                if cy.violation_amount(p, self.frame_radius) > 0:
+                    return False
+        return True
+
+    def filter_step(self, qpos, step):
+        """Backtrack the joint step until no link crosses obstacles."""
+        s = 1.0
+        for _ in range(self.max_backtrack):
+            qcand = pin.integrate(self.model, qpos, step * s)
+            if self._is_safe_qpos(qcand):
+                return step * s  # first safe scale
+            s *= 0.5
+            if s < self.min_scale:
+                return np.zeros_like(step)  # hold if we can't find a safe step
+        return np.zeros_like(step)
+
+
 class PinocchioMotionControl(BaseMotionControl):
     def __init__(
         self,
@@ -68,6 +148,13 @@ class PinocchioMotionControl(BaseMotionControl):
         self.frame_mapping = frame_mapping
         self.ee_frame_id = frame_mapping[ee_name]
 
+        # Optional collision/link guard configuration
+        self.guard = None
+        guard_cfg = cfg.get("collision_guard", {})
+        if guard_cfg.get("enabled", False):
+            self.guard = CollisionGuard(self.model, self.data, frame_mapping, guard_cfg)
+            print("[CollisionGuard] enabled with", len(self.guard.frame_ids), "frames")
+
         # Current state
         self.qpos = pin.neutral(self.model)
         pin.forwardKinematics(self.model, self.data, self.qpos)
@@ -104,6 +191,8 @@ class PinocchioMotionControl(BaseMotionControl):
 
             v = J.T.dot(np.linalg.solve(J.dot(J.T) + self.ik_damping, err))
             step = np.clip(v * self.dt, -self.max_joint_step, self.max_joint_step)
+            if self.guard is not None:
+                step = self.guard.filter_step(qpos, step)
             qpos = pin.integrate(self.model, qpos, step)
 
             if self.has_lower.any():
