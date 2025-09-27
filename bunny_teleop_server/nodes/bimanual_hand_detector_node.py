@@ -189,7 +189,7 @@ class VisionProHandDetector(Node):
 
             # Update time stamp and duration
             now = self.clock.now()
-            msg.duration = (self.last_time - now).to_msg()
+            msg.duration = (now - self.last_time).to_msg()
             self.last_time = now
             self.detection_pub.publish(msg)
         except Exception as e:

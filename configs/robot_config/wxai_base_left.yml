@@ -11,22 +11,43 @@ robot_cfg:
   # Set enabled: true and tune frames/obstacles for your setup
   collision_guard:
     enabled: true
+    frame_radius_m: 0.02
+    min_scale: 0.02  # hold cleanly if no safe scale found
+    max_backtrack: 10
     frame_names:
+      - base_link
+      - link_1
       - link_2
       - link_3
       - link_4
+      - link_5
       - link_6
-    frame_radius_m: 0.025
-    max_backtrack: 10
-    min_scale: 1.0e-3
-    # Example obstacles (adjust to your base frame)
+      - gripper_base
+      - gripper_tip
     planes:
-      - name: left_wall
-        point: [0.0, -0.220, 0.0]
+      - name: left_9in
+        point: [0.0, -0.2286, 0.0]
         normal: [0.0, 1.0, 0.0]
-        margin: 0.010
+        margin: 0.0
+      - name: right_9in
+        point: [0.0, 0.2286, 0.0]
+        normal: [0.0, -1.0, 0.0]
+        margin: 0.0
     cylinders:
-      - name: side_rod
-        center_xy: [0.250, -0.210]
-        radius: 0.010
-        margin: 0.015
+      # Vertical cage posts (keep 1" margin around 3/4" rods)
+      - name: pillar_front_left
+        center_xy: [-0.3429, -0.2286]
+        radius: 0.01905
+        margin: 0.0254
+      - name: pillar_back_left
+        center_xy: [-0.3429, 0.2286]
+        radius: 0.01905
+        margin: 0.0254
+      - name: pillar_front_right
+        center_xy: [0.3429, -0.2286]
+        radius: 0.01905
+        margin: 0.0254
+      - name: pillar_back_right
+        center_xy: [0.3429, 0.2286]
+        radius: 0.01905
+        margin: 0.0254

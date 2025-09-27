@@ -50,6 +50,7 @@ class CollisionGuard:
         self.frame_radius = float(cfg.get("frame_radius_m", 0.02))  # ~2 cm default
         self.max_backtrack = int(cfg.get("max_backtrack", 10))
         self.min_scale = float(cfg.get("min_scale", 1e-3))
+        self.relief_eps = float(cfg.get("relief_eps", 1e-4))
 
         # Obstacles
         self.planes = []
@@ -76,16 +77,35 @@ class CollisionGuard:
                     return False
         return True
 
+    def _violation_score(self, qpos) -> float:
+        """Return the worst positive violation; <=0 means fully safe."""
+        pin.forwardKinematics(self.model, self.data, qpos)
+        worst = 0.0
+        for fid in self.frame_ids:
+            oMf = pin.updateFramePlacement(self.model, self.data, fid)
+            p = oMf.translation
+            for pl in self.planes:
+                worst = max(worst, pl.violation_amount(p, self.frame_radius))
+            for cy in self.cyls:
+                worst = max(worst, cy.violation_amount(p, self.frame_radius))
+        return worst
+
     def filter_step(self, qpos, step):
-        """Backtrack the joint step until no link crosses obstacles."""
+        """Backtrack joint step, allowing relief while already in violation."""
+        v0 = self._violation_score(qpos)
         s = 1.0
         for _ in range(self.max_backtrack):
             qcand = pin.integrate(self.model, qpos, step * s)
-            if self._is_safe_qpos(qcand):
-                return step * s  # first safe scale
+            if v0 <= 0.0:
+                if self._is_safe_qpos(qcand):
+                    return step * s
+            else:
+                v1 = self._violation_score(qcand)
+                if v1 <= 0.0 or v1 < v0 - self.relief_eps:
+                    return step * s
             s *= 0.5
             if s < self.min_scale:
-                return np.zeros_like(step)  # hold if we can't find a safe step
+                return np.zeros_like(step)
         return np.zeros_like(step)
 
 
@@ -151,8 +171,17 @@ class PinocchioMotionControl(BaseMotionControl):
         # Optional collision/link guard configuration
         self.guard = None
         guard_cfg = cfg.get("collision_guard", {})
+        guard_cfg_expanded = guard_cfg
         if guard_cfg.get("enabled", False):
-            self.guard = CollisionGuard(self.model, self.data, frame_mapping, guard_cfg)
+            names_val = guard_cfg.get("frame_names", [])
+            if names_val == "__ALL__" or names_val == ["__ALL__"]:
+                guard_cfg_expanded = dict(guard_cfg)
+                guard_cfg_expanded["frame_names"] = [
+                    f.name for f in self.model.frames if f.name != "universe"
+                ]
+            self.guard = CollisionGuard(
+                self.model, self.data, frame_mapping, guard_cfg_expanded
+            )
             print("[CollisionGuard] enabled with", len(self.guard.frame_ids), "frames")
 
         # Current state
@@ -167,20 +196,32 @@ class PinocchioMotionControl(BaseMotionControl):
         self.has_lower = np.isfinite(self.lower)
         self.has_upper = np.isfinite(self.upper)
         self.max_joint_step = np.deg2rad(10.0)
+        self._hold_streak_s = 0.0
+        self._retreat_timer_s = 0.0
+        self._retreat_after_hold_s = float(guard_cfg.get("retreat_after_hold_s", 0.6))
+        self._retreat_duration_s = float(guard_cfg.get("retreat_duration_s", 1.0))
+        self._home_ee_pose = pin.SE3()
+        home_q = pin.neutral(self.model)
+        pin.forwardKinematics(self.model, self.data, home_q)
+        self._home_ee_pose = pin.updateFramePlacement(
+            self.model, self.data, self.ee_frame_id
+        )
 
     def step(self, pos: Optional[np.ndarray], quat: Optional[np.ndarray], repeat=1):
         xyzw = np.array([quat[1], quat[2], quat[3], quat[0]])
         pose_vec = np.concatenate([pos, xyzw])
-        oMdes = pin.XYZQUATToSE3(pose_vec)
+        commanded_pose = pin.XYZQUATToSE3(pose_vec)
+        oMdes = self._home_ee_pose if self._retreat_timer_s > 0.0 else commanded_pose
         with self._qpos_lock:
             qpos = self.qpos.copy()
         prev_err_norm = None
 
         for k in range(100 * repeat):
+            target_pose = self._home_ee_pose if self._retreat_timer_s > 0.0 else oMdes
             pin.forwardKinematics(self.model, self.data, qpos)
             ee_pose = pin.updateFramePlacement(self.model, self.data, self.ee_frame_id)
             J = pin.computeFrameJacobian(self.model, self.data, qpos, self.ee_frame_id)
-            iMd = ee_pose.actInv(oMdes)
+            iMd = ee_pose.actInv(target_pose)
             err = pin.log(iMd).vector
             err_norm = np.linalg.norm(err)
             if err_norm < self.ik_eps:
@@ -193,6 +234,29 @@ class PinocchioMotionControl(BaseMotionControl):
             step = np.clip(v * self.dt, -self.max_joint_step, self.max_joint_step)
             if self.guard is not None:
                 step = self.guard.filter_step(qpos, step)
+            if k == 0 and self.guard is not None:
+                held = np.allclose(step, 0.0)
+                pushing_toward_wall = False
+                if self._retreat_timer_s <= 0.0:
+                    ee_p = ee_pose.translation
+                    dcmd = commanded_pose.translation - ee_p
+                    for pl in self.guard.planes:
+                        if abs(pl.normal[1]) > 0.5:
+                            signed_dist = (ee_p - pl.point).dot(pl.normal)
+                            threshold = self.guard.frame_radius + pl.margin + 1e-4
+                            if signed_dist < threshold and dcmd.dot(pl.normal) < 0.0:
+                                pushing_toward_wall = True
+                                break
+                if held and pushing_toward_wall:
+                    self._hold_streak_s += self.dt
+                    if self._hold_streak_s >= self._retreat_after_hold_s:
+                        self._retreat_timer_s = self._retreat_duration_s
+                        self._hold_streak_s = 0.0
+                        oMdes = self._home_ee_pose
+                else:
+                    self._hold_streak_s = 0.0
+                if self._retreat_timer_s > 0.0:
+                    self._retreat_timer_s = max(0.0, self._retreat_timer_s - self.dt)
             qpos = pin.integrate(self.model, qpos, step)
 
             if self.has_lower.any():

@@ -72,6 +72,9 @@ class SafetyParams:
     v_max_rot: float = np.deg2rad(180)
     boundary_slowdown_dist: float = 0.03
     hold_on_violation: bool = True
+    # anti-jitter guard bands (position in meters, rotation in radians)
+    pos_deadband_m: float = 0.002
+    rot_deadband_rad: float = np.deg2rad(2.0)
 
     # bimanual separation (<=0 disables)
     inter_arm_min_dist: float = -1.0
@@ -115,8 +118,11 @@ class BimanualSafetyManager:
         p = target_pos.copy()
         q = target_quat.copy()
 
+        # Important: push first then clamp, repeat to avoid reintroducing violations
+        p = self._push_from_pillars(arm_index, p)
         p = self._clamp_to_workspace(arm_index, p)
         p = self._push_from_pillars(arm_index, p)
+        p = self._clamp_to_workspace(arm_index, p)
         q = self._project_orientation(q)
 
         if self.params.inter_arm_min_dist is not None and self.params.inter_arm_min_dist > 0:
@@ -183,6 +189,7 @@ class BimanualSafetyManager:
         return rt.quaternion_from_matrix(R)
 
     def _ease_near_edges(self, arm: int, p: np.ndarray) -> np.ndarray:
+        # Placeholder for optional tapers near workspace edges
         return p
 
     def _rate_limit(
@@ -191,6 +198,10 @@ class BimanualSafetyManager:
         last = self._last_cmd[arm]
         if last is None or dt <= 0:
             return p, q
+
+        # --- anti-jitter deadband (position) ---
+        if np.linalg.norm(p - last.ee_pos) < self.params.pos_deadband_m:
+            p = last.ee_pos.copy()
 
         # --- position limiter ---
         delta = p - last.ee_pos
@@ -204,6 +215,10 @@ class BimanualSafetyManager:
         q1 = q / max(np.linalg.norm(q), 1e-12)
         dot = float(np.clip(abs(np.dot(q0, q1)), 0.0, 1.0))
         angle = 2.0 * np.arccos(dot)
+        # --- anti-jitter deadband (rotation) ---
+        if angle < self.params.rot_deadband_rad:
+            q = q0
+            return p, q
         if angle > 1e-6:
             t = min(1.0, (self.params.v_max_rot * dt) / angle)
             q = rt.quaternion_slerp(q0, q1, t, shortest_path=True)
