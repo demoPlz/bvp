@@ -42,12 +42,24 @@ OPERATOR2AVP_LEFT = np.array(
 
 
 
-# 180 deg rotation about gravity to mirror operator view when facing the robot
+# Mirror the operator view across the robot's sagittal plane (left/right flip)
+# while preserving forward/backward motion when the robot faces the operator.
 FRONT_FACING_MIRROR_ROT = np.array(
     [
-        [-1.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
         [0.0, -1.0, 0.0],
         [0.0, 0.0, 1.0],
+    ]
+)
+
+
+
+# Matching axis reflection used when mirroring wrist orientation
+FRONT_FACING_AXIS_MIRROR = np.array(
+    [
+        [-1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, -1.0],
     ]
 )
 
