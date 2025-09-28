@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Sequence
 from pathlib import Path
 
 import numpy as np
@@ -41,6 +41,10 @@ class BaseMotionControl:
     @abstractmethod
     def is_use_gpu(self) -> bool:
         pass
+
+    def configure_environment_base_pose(self, base_pose_pq: Optional[Sequence[float]]):
+        """Optional hook for controllers that need environment pose data."""
+        return None
 
     @staticmethod
     def get_urdf_absolute_path(cfg: dict, robot_config_path: Path) -> Path:

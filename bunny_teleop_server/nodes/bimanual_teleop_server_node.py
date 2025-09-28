@@ -1,3 +1,4 @@
+import os
 import time
 from copy import deepcopy
 from functools import partial
@@ -21,6 +22,11 @@ from bunny_teleop_server.utils.robot_utils import (
     LPRotationFilter,
     FRONT_FACING_MIRROR_ROT,
     FRONT_FACING_AXIS_MIRROR,
+)
+
+
+SAFE_MODE_ENABLED = (
+    os.getenv("BTP_SAFE_MODE", "0").strip().lower() in {"1", "true", "yes", "on"}
 )
 
 
@@ -131,6 +137,13 @@ class BimanualRobotTeleopNode(BimanualMonitorNode):
         self.align_gravity_dir = init_config.align_gravity_dir
         self.bimanual_alignment_mode = init_config.bimanual_alignment_mode
         print(f"Initialization mode: {self.bimanual_alignment_mode}")
+
+        for base_pose, hand in zip(
+            self.robot_base_pose,
+            [self.left_hand_arm, self.right_hand_arm],
+        ):
+            if hasattr(hand.motion_control, "configure_environment_base_pose"):
+                hand.motion_control.configure_environment_base_pose(base_pose)
 
         # Build index mapping for retargeting optimizer and check joint completeness
         self.left_hand_arm.set_optimizer_index(
@@ -474,6 +487,7 @@ class SingleArmHandNode:
         self.motion_scaling_factor = motion_scaling_factor
         self.action_update_dt = 1 / 60
         self.motion_control = motion_control
+        self.safe_mode_enabled = SAFE_MODE_ENABLED
         control_repeat = int(
             max(1, round(self.action_update_dt / self.motion_control.get_timestep()))
         )
@@ -493,6 +507,36 @@ class SingleArmHandNode:
         # Initialization config
         self.index_client2optimizer = None
         self.index_client2control = None
+
+    def _gate_orientation_forward_side(
+        self, pos: np.ndarray, quat_wxyz: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        R = rotations.matrix_from_quaternion(quat_wxyz)
+        forward = R[:, 0]
+
+        if forward[0] < 0.0:
+            rotate_pi = rotations.matrix_from_euler(
+                [0.0, 0.0, np.pi], 2, 1, 0, extrinsic=False
+            )
+            R = rotate_pi @ R
+            forward = R[:, 0]
+
+        lateral = forward[1]
+        if self.hand_index == 1 and lateral < 0.0:
+            yaw = np.arctan2(-lateral, max(forward[0], 1e-9))
+            adjust = rotations.matrix_from_euler(
+                [0.0, 0.0, yaw], 2, 1, 0, extrinsic=False
+            )
+            R = adjust @ R
+        elif self.hand_index == 0 and lateral > 0.0:
+            yaw = np.arctan2(lateral, max(forward[0], 1e-9))
+            adjust = rotations.matrix_from_euler(
+                [0.0, 0.0, -yaw], 2, 1, 0, extrinsic=False
+            )
+            R = adjust @ R
+
+        gated_quat = rotations.quaternion_from_matrix(R)
+        return pos, gated_quat
 
     def update_last_retargeted_qpos(self, joint: np.ndarray):
         # Compute the input vector
@@ -548,9 +592,15 @@ class SingleArmHandNode:
             filter_ee_pos = self.wrist_pos_filter.next(ee_pos)
             filter_ee_quat = self.wrist_rot_filter.next(ee_quat)
 
+            safe_pos, safe_quat = filter_ee_pos, filter_ee_quat
+            if self.safe_mode_enabled and not self.disable_orientation_control:
+                safe_pos, safe_quat = self._gate_orientation_forward_side(
+                    filter_ee_pos, filter_ee_quat
+                )
+
             # Combine with simulated environment
-            target_ee_pose = np.concatenate([filter_ee_pos, filter_ee_quat])
-            self.motion_control.step(filter_ee_pos, filter_ee_quat, repeat_times)
+            target_ee_pose = np.concatenate([safe_pos, safe_quat])
+            self.motion_control.step(safe_pos, safe_quat, repeat_times)
 
             control_qpos = self.motion_control.get_current_qpos()
             with self.motion_control_lock:
